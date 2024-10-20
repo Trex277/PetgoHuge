@@ -1,0 +1,89 @@
+local message = Welcome To AshuraHub require(game.ReplicatedStorage.Library.Client.Message)
+
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local Window = OrionLib:MakeWindow({Name = "AshuraHub", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
+
+local Pets = require(game:GetService("ReplicatedStorage").Library.Items.PetItem).Directory
+
+local fromPet = "None"
+local toPet = "None"
+local selectedHugePet = "None"
+
+function FromPet1()
+    if fromPet ~= "None" then
+        for i, v in pairs(Pets[fromPet] or {}) do
+            Pets[fromPet][i] = nil
+        end
+    end
+end
+
+function ToPet2()
+    if toPet ~= "None" then 
+        for i, v in pairs(Pets[toPet] or {}) do
+            Pets[fromPet][i] = v
+        end
+    end
+    
+    if selectedHugePet ~= "None" then
+        for i, v in pairs(Pets[selectedHugePet] or {}) do
+            Pets[fromPet][i] = v
+        end
+    end
+end
+
+local Tab = Window:MakeTab({
+    Name = "Pets To Huge!",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+Tab:AddTextbox({
+    Name = "From Pet",
+    Default = "None",
+    TextDisappear = false,
+    Callback = function(Value)
+        fromPet = Value
+    end
+})
+
+local petOptions = {"None"} 
+
+for petName in pairs(Pets) do
+    table.insert(petOptions, petName)
+end
+
+Tab:AddDropdown({
+    Name = "Pets",
+    Default = "None", 
+    Options = petOptions,
+    Callback = function(Value)
+        toPet = Value
+    end
+})
+
+local hugePetsOptions = {"None"} 
+
+for petName in pairs(Pets) do
+    if string.match(petName, "^Huge") then
+        table.insert(hugePetsOptions, petName)
+    end
+end
+
+Tab:AddDropdown({
+    Name = "Huge Pets",
+    Default = hugePetsOptions[1],
+    Options = hugePetsOptions,
+    Callback = function(Value)
+        selectedHugePet = Value
+    end
+})
+
+Tab:AddButton({
+    Name = "Changed",
+    Callback = function()
+        FromPet1()
+        ToPet2()
+        local message = require(game.ReplicatedStorage.Library.Client.Message)
+        message.New("Pet Changed!\ndiscord.gg/darkscripts", { title = "Successfully Changed" })
+    end
+})
